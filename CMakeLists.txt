@@ -9,6 +9,15 @@ endif()
 find_package(Threads REQUIRED)
 find_package(Boost COMPONENTS unit_test_framework REQUIRED)
 
+if(APPLE)
+    message(STATUS "---------------------")
+    message(STATUS "Boost_FOUND: ${Boost_FOUND}")
+    message(STATUS "Boost_INCLUDE_DIRS: ${Boost_INCLUDE_DIRS}")
+    message(STATUS "Boost_LIBRARY_DIRS: ${Boost_LIBRARY_DIRS}")
+    message(STATUS "Boost_LIBRARIES: ${Boost_LIBRARIES}")
+    message(STATUS "---------------------")
+endif()
+
 configure_file(version.h.in ${PROJECT_SOURCE_DIR}/version.h)
 
 add_executable(helloworld_cli main.cpp)
@@ -23,10 +32,17 @@ set_target_properties(helloworld_cli helloworld test_version PROPERTIES
     COMPILE_OPTIONS "-Wpedantic;-Wall;-Wextra"
 )
 
-set_target_properties(test_version PROPERTIES
-    COMPILE_DEFINITIONS BOOST_TEST_DYN_LINK
-    INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIR}
-)
+if(APPLE)
+    set_target_properties(test_version PROPERTIES
+        COMPILE_DEFINITIONS BOOST_TEST_DYN_LINK
+        INCLUDE_DIRECTORIES /usr/local/include
+    )
+else()
+    set_target_properties(test_version PROPERTIES
+        COMPILE_DEFINITIONS BOOST_TEST_DYN_LINK
+        INCLUDE_DIRECTORIES "${Boost_INCLUDE_DIR}"
+    )
+endif()
 
 target_link_libraries(helloworld_cli
     helloworld
