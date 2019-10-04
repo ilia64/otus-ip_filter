@@ -32,17 +32,10 @@ set_target_properties(helloworld_cli helloworld test_version PROPERTIES
     COMPILE_OPTIONS "-Wpedantic;-Wall;-Wextra"
 )
 
-if(APPLE)
-    set_target_properties(test_version PROPERTIES
-        COMPILE_DEFINITIONS BOOST_TEST_DYN_LINK
-        INCLUDE_DIRECTORIES /usr/local/include
-    )
-else()
-    set_target_properties(test_version PROPERTIES
-        COMPILE_DEFINITIONS BOOST_TEST_DYN_LINK
-        INCLUDE_DIRECTORIES "${Boost_INCLUDE_DIR}"
-    )
-endif()
+set_target_properties(test_version PROPERTIES
+    COMPILE_DEFINITIONS BOOST_TEST_DYN_LINK
+    INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIRS}
+)
 
 target_link_libraries(helloworld_cli
     helloworld
