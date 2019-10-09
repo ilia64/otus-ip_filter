@@ -1,22 +1,15 @@
 cmake_minimum_required(VERSION 3.2)
 
+set(HOMEWORK_NAME helloworld)
+
 if(APPLE)
-    project(cmake VERSION 0.0.1$ENV{TRAVIS_BUILD_NUMBER})
+    project(${HOMEWORK_NAME} VERSION 0.0.1)
 else()
-    project(cmake VERSION 0.0.$ENV{TRAVIS_BUILD_NUMBER})
+    project(${HOMEWORK_NAME} VERSION 0.0.$ENV{TRAVIS_BUILD_NUMBER})
 endif()
 
 find_package(Threads REQUIRED)
 find_package(Boost COMPONENTS unit_test_framework REQUIRED)
-
-if(APPLE)
-    message(STATUS "---------------------")
-    message(STATUS "Boost_FOUND: ${Boost_FOUND}")
-    message(STATUS "Boost_INCLUDE_DIRS: ${Boost_INCLUDE_DIRS}")
-    message(STATUS "Boost_LIBRARY_DIRS: ${Boost_LIBRARY_DIRS}")
-    message(STATUS "Boost_LIBRARIES: ${Boost_LIBRARIES}")
-    message(STATUS "---------------------")
-endif()
 
 configure_file(version.h.in ${PROJECT_SOURCE_DIR}/version.h)
 
