@@ -1,10 +1,10 @@
 cmake_minimum_required(VERSION 3.2)
 
-if(APPLE)
-    project(homework VERSION 0.0.1)
-else()
-    project(homework VERSION 0.0.$ENV{TRAVIS_BUILD_NUMBER})
+if(NOT DEFINED ENV{TRAVIS_BUILD_NUMBER})
+    set(ENV{TRAVIS_BUILD_NUMBER} 0)
 endif()
+
+project(homework VERSION 0.0.$ENV{TRAVIS_BUILD_NUMBER})
 
 find_package(Threads REQUIRED)
 find_package(Boost COMPONENTS unit_test_framework REQUIRED)
