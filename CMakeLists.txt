@@ -1,11 +1,9 @@
 cmake_minimum_required(VERSION 3.2)
 
-set(HOMEWORK_NAME helloworld)
-
 if(APPLE)
-    project(${HOMEWORK_NAME} VERSION 0.0.1)
+    project(homework VERSION 0.0.1)
 else()
-    project(${HOMEWORK_NAME} VERSION 0.0.$ENV{TRAVIS_BUILD_NUMBER})
+    project(homework VERSION 0.0.$ENV{TRAVIS_BUILD_NUMBER})
 endif()
 
 find_package(Threads REQUIRED)
