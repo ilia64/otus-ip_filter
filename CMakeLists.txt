@@ -30,7 +30,7 @@ set_target_properties(test_version PROPERTIES
     INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIRS}
 )
 
-target_link_libraries(helloworld_cli
+target_link_libraries(helloworld
     helloworld
     Threads::Threads
 )
