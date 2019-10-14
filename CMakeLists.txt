@@ -1,10 +1,12 @@
 cmake_minimum_required(VERSION 3.2)
 
 if(NOT DEFINED ENV{TRAVIS_BUILD_NUMBER})
-    set(ENV{TRAVIS_BUILD_NUMBER} 0)
+    set(ENV{TRAVIS_BUILD_NUMBER} 1)
 endif()
 
-project(homework VERSION 0.0.$ENV{TRAVIS_BUILD_NUMBER})
+project(helloworld VERSION 0.0.$ENV{TRAVIS_BUILD_NUMBER})
+
+message("-- Build: ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}")
 
 find_package(Threads REQUIRED)
 find_package(Boost COMPONENTS unit_test_framework REQUIRED)
