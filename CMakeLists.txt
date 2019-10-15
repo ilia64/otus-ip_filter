@@ -15,7 +15,7 @@ configure_file(version.h.in ${PROJECT_SOURCE_DIR}/version.h)
 
 add_executable(helloworld main.cpp)
 
-add_library(helloworld lib.cpp)
+add_library(helloworld_lib lib.cpp)
 
 add_executable(test_version test_version.cpp)
 
@@ -31,13 +31,13 @@ set_target_properties(test_version PROPERTIES
 )
 
 target_link_libraries(helloworld
-    helloworld
+    helloworld_lib
     Threads::Threads
 )
 
 target_link_libraries(test_version
     ${Boost_LIBRARIES}
-    helloworld
+    helloworld_lib
 )
 
 install(TARGETS helloworld RUNTIME DESTINATION bin)
