@@ -40,6 +40,12 @@ int main(int argc, char const *argv[])
 
         for(std::string line; std::getline(std::cin, line);)
         {
+            //TODO @i.lukin remove on done
+            if (line.empty())
+            {
+                break;
+            }
+
             Address address = split(line, '\t');
             pool.push_back(split(address.at(0), '.'));
         }
