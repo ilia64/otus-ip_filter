@@ -4,8 +4,8 @@
 #include <string>
 #include <vector>
 
-using Adress = std::vector<std::string>;
-using List = std::vector<Adress>;
+using Address = std::vector<std::string>;
+using Pool = std::vector<Address>;
 
 // ("",  '.') -> [""]
 // ("11", '.') -> ["11"]
@@ -13,42 +13,42 @@ using List = std::vector<Adress>;
 // ("11.", '.') -> ["11", ""]
 // (".11", '.') -> ["", "11"]
 // ("11.22", '.') -> ["11", "22"]
-Adress split(const std::string &str, char d)
+Address split(const std::string& source, char delimiter)
 {
-    Adress r;
+    Address address;
 
     std::string::size_type start = 0;
-    std::string::size_type stop = str.find_first_of(d);
+    std::string::size_type stop = source.find_first_of(delimiter);
     while(stop != std::string::npos)
     {
-        r.push_back(str.substr(start, stop - start));
+        address.push_back(source.substr(start, stop - start));
 
         start = stop + 1;
-        stop = str.find_first_of(d, start);
+        stop = source.find_first_of(delimiter, start);
     }
 
-    r.push_back(str.substr(start));
+    address.push_back(source.substr(start));
 
-    return r;
+    return address;
 }
 
 int main(int argc, char const *argv[])
 {
     try
     {
-        List ip_pool;
+        Pool pool;
 
         for(std::string line; std::getline(std::cin, line);)
         {
-            Adress v = split(line, '\t');
-            ip_pool.push_back(split(v.at(0), '.'));
+            Address address = split(line, '\t');
+            pool.push_back(split(address.at(0), '.'));
         }
 
         // TODO reverse lexicographically sort
 
-        for(List::const_iterator ip = ip_pool.cbegin(); ip != ip_pool.cend(); ++ip)
+        for(Pool::const_iterator ip = pool.cbegin(); ip != pool.cend(); ++ip)
         {
-            for(Adress::const_iterator ip_part = ip->cbegin(); ip_part != ip->cend(); ++ip_part)
+            for(Address::const_iterator ip_part = ip->cbegin(); ip_part != ip->cend(); ++ip_part)
             {
                 if (ip_part != ip->cbegin())
                 {
