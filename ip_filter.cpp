@@ -3,10 +3,11 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <set>
 
 using Chunk = int;
 using Address = std::vector<Chunk>;
-using Pool = std::vector<Address>;
+using Pool = std::multiset<Address>;
 
 // ("",  '.') -> [""]
 // ("11", '.') -> ["11"]
@@ -49,13 +50,13 @@ std::ostream& operator<< (std::ostream &out, const Address& address)
 std::ostream& operator<< (std::ostream &out, const Pool& pool)
 {
     bool first = true;
-    for (const auto& address : pool)
+    for (auto pos = pool.rbegin(); pos != pool.rend(); ++pos)
     {
         if (!first)
         {
             std::cout << '\n';
         }
-        out << address;
+        out << *(pos);
         first = false;
     }
     return out;
@@ -77,10 +78,8 @@ int main()
 
             auto pos = std::find(line.begin(), line.end(), '\t');
             Address address = split(line.begin(), pos, '.');
-            pool.push_back(std::move(address));
+            pool.insert(std::move(address));
         }
-
-        std::sort(pool.rbegin(), pool.rend());
 
         std::cout << pool << std::endl;
         // 222.173.235.246
