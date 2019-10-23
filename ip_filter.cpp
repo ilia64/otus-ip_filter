@@ -13,21 +13,17 @@ using Pool = std::vector<Address>;
 // ("11.", '.') -> ["11", ""]
 // (".11", '.') -> ["", "11"]
 // ("11.22", '.') -> ["11", "22"]
-Address split(const std::string& source, char delimiter)
+template <typename Iter, typename D>
+Address split(Iter begin, Iter end, D delimiter)
 {
     Address address;
 
-    std::string::size_type start = 0;
-    std::string::size_type stop = source.find_first_of(delimiter);
-    while(stop != std::string::npos)
+    while (begin != end)
     {
-        address.push_back(source.substr(start, stop - start));
-
-        start = stop + 1;
-        stop = source.find_first_of(delimiter, start);
+        Iter pos = std::find(begin, end, delimiter);
+        address.push_back(std::string(begin, pos));
+        begin = (pos == end) ? end : std::next(pos);
     }
-
-    address.push_back(source.substr(start));
 
     return address;
 }
@@ -46,8 +42,9 @@ int main(int argc, char const *argv[])
                 break;
             }
 
-            Address address = split(line, '\t');
-            pool.push_back(split(address.at(0), '.'));
+            auto pos = std::find(line.begin(), line.end(), '\t');
+            Address address = split(line.begin(), pos, '.');
+            pool.push_back(std::move(address));
         }
 
         // TODO reverse lexicographically sort
