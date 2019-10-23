@@ -80,10 +80,9 @@ int main(int argc, char const *argv[])
             pool.push_back(std::move(address));
         }
 
-        // TODO reverse lexicographically sort
+        std::sort(pool.rbegin(), pool.rend());
 
         std::cout << pool << std::endl;
-
         // 222.173.235.246
         // 222.130.177.64
         // 222.82.198.61
