@@ -4,7 +4,8 @@
 #include <string>
 #include <vector>
 
-using Address = std::vector<std::string>;
+using Chunk = int;
+using Address = std::vector<Chunk>;
 using Pool = std::vector<Address>;
 
 // ("",  '.') -> [""]
@@ -21,7 +22,9 @@ Address split(Iter begin, Iter end, D delimiter)
     while (begin != end)
     {
         Iter pos = std::find(begin, end, delimiter);
-        address.push_back(std::string(begin, pos));
+        Chunk chunk = std::stoi(std::string(begin, pos));
+        assert(chunk >= 0 && chunk <= 255);
+        address.push_back(chunk);
         begin = (pos == end) ? end : std::next(pos);
     }
 
