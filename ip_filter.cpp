@@ -28,6 +28,36 @@ Address split(Iter begin, Iter end, D delimiter)
     return address;
 }
 
+std::ostream& operator<< (std::ostream &out, const Address& address)
+{
+    bool first = true;
+    for (const auto& part : address)
+    {
+        if (!first)
+        {
+            out << '.';
+        }
+        out << part;
+        first = false;
+    }
+    return out;
+}
+
+std::ostream& operator<< (std::ostream &out, const Pool& pool)
+{
+    bool first = true;
+    for (const auto& address : pool)
+    {
+        if (!first)
+        {
+            std::cout << '\n';
+        }
+        out << address;
+        first = false;
+    }
+    return out;
+}
+
 int main(int argc, char const *argv[])
 {
     try
@@ -49,19 +79,7 @@ int main(int argc, char const *argv[])
 
         // TODO reverse lexicographically sort
 
-        for(Pool::const_iterator ip = pool.cbegin(); ip != pool.cend(); ++ip)
-        {
-            for(Address::const_iterator ip_part = ip->cbegin(); ip_part != ip->cend(); ++ip_part)
-            {
-                if (ip_part != ip->cbegin())
-                {
-                    std::cout << ".";
-
-                }
-                std::cout << *ip_part;
-            }
-            std::cout << std::endl;
-        }
+        std::cout << pool << std::endl;
 
         // 222.173.235.246
         // 222.130.177.64
