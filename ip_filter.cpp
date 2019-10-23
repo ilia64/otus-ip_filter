@@ -61,7 +61,7 @@ std::ostream& operator<< (std::ostream &out, const Pool& pool)
     return out;
 }
 
-int main(int argc, char const *argv[])
+int main()
 {
     try
     {
