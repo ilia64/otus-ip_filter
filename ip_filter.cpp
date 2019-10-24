@@ -111,8 +111,8 @@ int main()
 
             auto pos = std::find(line.begin(), line.end(), '\t');
             Address address = split(line.begin(), pos, '.');
-
             assert(address.size() == 4);
+
             for (size_t i = 0; i < 4; i++)
             {
                 Chunk chunk = address[i];
@@ -122,7 +122,7 @@ int main()
             pool.insert(std::move(address));
         }
 
-        std::cout << '\n' << pool << std::endl;
+        std::cout << pool << std::endl;
         // 222.173.235.246
         // 222.130.177.64
         // 222.82.198.61
@@ -131,20 +131,20 @@ int main()
         // 1.29.168.152
         // 1.1.234.8
 
-        std::cout << '\n'  << filter(cache, 1) << std::endl;
+        std::cout << filter(cache, 1) << std::endl;
         // 1.231.69.33
         // 1.87.203.225
         // 1.70.44.170
         // 1.29.168.152
         // 1.1.234.8
 
-        std::cout << '\n'  << filter(cache, 46, 70) << std::endl;
+        std::cout << filter(cache, 46, 70) << std::endl;
         // 46.70.225.39
         // 46.70.147.26
         // 46.70.113.73
         // 46.70.29.76
 
-        std::cout << '\n' << filter<true>(cache, 46) << std::endl;
+        std::cout << filter<true>(cache, 46) << std::endl;
         // 186.204.34.46
         // 186.46.222.194
         // 185.46.87.231
