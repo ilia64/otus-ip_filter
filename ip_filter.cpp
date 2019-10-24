@@ -4,10 +4,12 @@
 #include <string>
 #include <vector>
 #include <set>
+#include <map>
 
 using Chunk = int;
 using Address = std::vector<Chunk>;
 using Pool = std::multiset<Address>;
+using Cache = std::map<Chunk, Pool>;
 
 // ("",  '.') -> [""]
 // ("11", '.') -> ["11"]
@@ -62,11 +64,30 @@ std::ostream& operator<< (std::ostream &out, const Pool& pool)
     return out;
 }
 
+Pool filter(Cache cache, bool any, Chunk chunk)
+{
+    if (any)
+    {
+        return cache.at(chunk);
+    }
+
+    Pool result;
+    for (auto address : cache.at(chunk))
+    {
+        if (address[0] == chunk)
+        {
+            result.insert(address);
+        }
+    }
+    return result;
+}
+
 int main()
 {
     try
     {
         Pool pool;
+        Cache cache;
 
         for(std::string line; std::getline(std::cin, line);)
         {
@@ -78,10 +99,18 @@ int main()
 
             auto pos = std::find(line.begin(), line.end(), '\t');
             Address address = split(line.begin(), pos, '.');
+
+            assert(address.size() == 4);
+            for (size_t i = 0; i < 4; i++)
+            {
+                Chunk chunk = address[i];
+                cache[chunk].insert(address);
+            }
+
             pool.insert(std::move(address));
         }
 
-        std::cout << pool << std::endl;
+        std::cout << '\n' << pool << std::endl;
         // 222.173.235.246
         // 222.130.177.64
         // 222.82.198.61
@@ -90,9 +119,7 @@ int main()
         // 1.29.168.152
         // 1.1.234.8
 
-        // TODO filter by first byte and output
-        // ip = filter(1)
-
+        std::cout << '\n'  << filter(cache, false, 1) << std::endl;
         // 1.231.69.33
         // 1.87.203.225
         // 1.70.44.170
@@ -107,9 +134,7 @@ int main()
         // 46.70.113.73
         // 46.70.29.76
 
-        // TODO filter by any byte and output
-        // ip = filter_any(46)
-
+        std::cout << '\n' << filter(cache, true, 46) << std::endl;
         // 186.204.34.46
         // 186.46.222.194
         // 185.46.87.231
