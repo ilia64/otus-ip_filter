@@ -64,7 +64,8 @@ std::ostream& operator<< (std::ostream &out, const Pool& pool)
     return out;
 }
 
-Pool filter(Cache cache, bool any, Chunk chunk)
+template <bool any = false>
+Pool filter(Cache cache, Chunk chunk)
 {
     if (any)
     {
@@ -119,7 +120,7 @@ int main()
         // 1.29.168.152
         // 1.1.234.8
 
-        std::cout << '\n'  << filter(cache, false, 1) << std::endl;
+        std::cout << '\n'  << filter(cache, 1) << std::endl;
         // 1.231.69.33
         // 1.87.203.225
         // 1.70.44.170
@@ -134,7 +135,7 @@ int main()
         // 46.70.113.73
         // 46.70.29.76
 
-        std::cout << '\n' << filter(cache, true, 46) << std::endl;
+        std::cout << '\n' << filter<true>(cache, 46) << std::endl;
         // 186.204.34.46
         // 186.46.222.194
         // 185.46.87.231
