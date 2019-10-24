@@ -64,22 +64,33 @@ std::ostream& operator<< (std::ostream &out, const Pool& pool)
     return out;
 }
 
-template <bool any = false>
-Pool filter(Cache cache, Chunk chunk)
+template <bool any = false, typename ...Args>
+Pool filter(Cache cache, Args... args)
 {
+    std::vector<Chunk> target{args...};
+    assert(!target.empty() && target.size() <= 4);
+
+    Pool pool = cache.at(target[0]);
     if (any)
     {
-        return cache.at(chunk);
+        return pool;
     }
 
     Pool result;
-    for (auto address : cache.at(chunk))
+
+    std::copy_if(pool.begin(), pool.end(),  std::inserter(result, result.end()), [&target](const Address& address)
     {
-        if (address[0] == chunk)
+        size_t size = target.size();
+        for (size_t i = 0; i < size; ++i)
         {
-            result.insert(address);
+            if(address[i] != target[i])
+            {
+                return false;
+            }
         }
-    }
+        return true;
+    });
+
     return result;
 }
 
@@ -127,9 +138,7 @@ int main()
         // 1.29.168.152
         // 1.1.234.8
 
-        // TODO filter by first and second bytes and output
-        // ip = filter(46, 70)
-
+        std::cout << '\n'  << filter(cache, 46, 70) << std::endl;
         // 46.70.225.39
         // 46.70.147.26
         // 46.70.113.73
