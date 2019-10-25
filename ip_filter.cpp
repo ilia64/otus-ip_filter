@@ -7,39 +7,45 @@
 #include <set>
 #include <map>
 
+struct compare;
+
 using Chunk = int;
 using Address = std::vector<Chunk>;
-using Pool = std::multiset<Address>;
+using AddressPtr = std::shared_ptr<Address>;
+using Pool = std::multiset<AddressPtr, compare>;
 using Cache = std::map<Chunk, Pool>;
 
-// ("",  '.') -> [""]
-// ("11", '.') -> ["11"]
-// ("..", '.') -> ["", "", ""]
-// ("11.", '.') -> ["11", ""]
-// (".11", '.') -> ["", "11"]
-// ("11.22", '.') -> ["11", "22"]
-template <typename Iter, typename D>
-Address split(Iter begin, Iter end, D delimiter)
+struct compare
 {
-    Address address;
-    address.reserve(4);
+    bool operator()(const AddressPtr& lhs, const AddressPtr& rhs) const
+    {
+        return *lhs < *rhs;
+    }
+};
+
+template <typename Iter, typename D>
+AddressPtr split(Iter begin, Iter end, D delimiter)
+{
+    AddressPtr address = std::make_shared<Address>();
+    address->reserve(4);
 
     while (begin != end)
     {
         Iter pos = std::find(begin, end, delimiter);
         Chunk chunk = std::stoi(std::string(begin, pos));
         assert(chunk >= 0 && chunk <= 255);
-        address.push_back(chunk);
+        address->push_back(chunk);
         begin = (pos == end) ? end : std::next(pos);
     }
 
+    assert(address->size() == 4);
     return address;
 }
 
-std::ostream& operator<< (std::ostream &out, const Address& address)
+std::ostream& operator<< (std::ostream &out, const AddressPtr& address)
 {
     bool first = true;
-    for (const auto& part : address)
+    for (const auto& part : *address)
     {
         if (!first)
         {
@@ -80,12 +86,12 @@ Pool filter(Cache cache, Chunk first, Args... args)
 
     Pool result;
 
-    std::copy_if(pool.begin(), pool.end(),  std::inserter(result, result.end()), [&target](const Address& address)
+    std::copy_if(pool.begin(), pool.end(),  std::inserter(result, result.end()), [&target](const AddressPtr& address)
     {
         size_t size = target.size();
         for (size_t i = 0; i < size; ++i)
         {
-            if(address[i] != target[i])
+            if(address->at(i) != target[i])
             {
                 return false;
             }
@@ -112,16 +118,15 @@ int main()
             }
 
             auto pos = std::find(line.begin(), line.end(), '\t');
-            Address address = split(line.begin(), pos, '.');
-            assert(address.size() == 4);
+            AddressPtr address = split(line.begin(), pos, '.');
 
             for (size_t i = 0; i < 4; i++)
             {
-                Chunk chunk = address[i];
+                Chunk chunk = (*address)[i];
                 cache[chunk].insert(address);
             }
 
-            pool.insert(std::move(address));
+            pool.insert(address);
         }
 
         std::cout << pool << std::endl;
