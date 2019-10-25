@@ -2,6 +2,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <algorithm>
+#include <memory>
 #include <string>
 #include <vector>
 #include <set>
