@@ -22,6 +22,7 @@ template <typename Iter, typename D>
 Address split(Iter begin, Iter end, D delimiter)
 {
     Address address;
+    address.reserve(4);
 
     while (begin != end)
     {
