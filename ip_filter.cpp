@@ -67,10 +67,10 @@ std::ostream& operator<< (std::ostream &out, const Pool& pool)
 }
 
 template <bool any = false, typename ...Args>
-Pool filter(Cache cache, Args... args)
+Pool filter(Cache cache, Chunk first, Args... args)
 {
-    std::vector<Chunk> target{args...};
-    assert(!target.empty() && target.size() <= 4);
+    std::vector<Chunk> target{first, args...};
+    assert(target.size() <= 4);
 
     Pool pool = cache.at(target[0]);
     if (any)
