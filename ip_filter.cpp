@@ -10,11 +10,11 @@
 
 struct compare;
 
-using Chunk = int;
-using Address = std::vector<Chunk>;
+using Octet = int;
+using Address = std::vector<Octet>;
 using AddressPtr = std::shared_ptr<Address>;
 using Pool = std::multiset<AddressPtr, compare>;
-using Cache = std::map<Chunk, Pool>;
+using RIndex = std::map<Octet, Pool>;
 
 struct compare
 {
@@ -33,7 +33,7 @@ AddressPtr split(Iter begin, Iter end, D delimiter)
     while (begin != end)
     {
         Iter pos = std::find(begin, end, delimiter);
-        Chunk chunk = std::stoi(std::string(begin, pos));
+        Octet chunk = std::stoi(std::string(begin, pos));
         assert(chunk >= 0 && chunk <= 255);
         address->push_back(chunk);
         begin = (pos == end) ? end : std::next(pos);
@@ -74,9 +74,9 @@ std::ostream& operator<< (std::ostream &out, const Pool& pool)
 }
 
 template <bool any = false, typename ...Args>
-Pool filter(Cache cache, Chunk first, Args... args)
+Pool filter(RIndex cache, Octet first, Args... args)
 {
-    std::vector<Chunk> target{first, args...};
+    std::vector<Octet> target{first, args...};
     assert(target.size() <= 4);
 
     Pool pool = cache.at(target[0]);
@@ -108,7 +108,7 @@ int main()
     try
     {
         Pool pool;
-        Cache cache;
+        RIndex cache;
 
         for(std::string line; std::getline(std::cin, line);)
         {
@@ -123,7 +123,7 @@ int main()
 
             for (size_t i = 0; i < 4; i++)
             {
-                Chunk chunk = (*address)[i];
+                Octet chunk = (*address)[i];
                 cache[chunk].insert(address);
             }
 
