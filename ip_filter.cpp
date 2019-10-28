@@ -2,97 +2,97 @@
 #include <cstdlib>
 #include <iostream>
 #include <algorithm>
-#include <memory>
 #include <string>
-#include <vector>
+#include <array>
 #include <set>
 #include <map>
 
-struct compare;
-
-using Octet = int;
-using Address = std::vector<Octet>;
-using AddressPtr = std::shared_ptr<Address>;
-using Pool = std::multiset<AddressPtr, compare>;
-using RIndex = std::map<Octet, Pool>;
-
-struct compare
-{
-    bool operator()(const AddressPtr& lhs, const AddressPtr& rhs) const
-    {
-        return *lhs < *rhs;
-    }
-};
+using Octet = unsigned char;
+using Address = std::array<Octet, 4>;
+using Pool = std::multiset<Address>;
+using PoolUnique = std::set<Address>;
+using RIndex = std::map<Octet, PoolUnique>;
 
 template <typename Iter, typename D>
-AddressPtr split(Iter begin, Iter end, D delimiter)
+Address split(Iter begin, Iter end, D delimiter)
 {
-    AddressPtr address = std::make_shared<Address>();
-    address->reserve(4);
+    Address address;
 
+    size_t index = 0;
     while (begin != end)
     {
         Iter pos = std::find(begin, end, delimiter);
-        Octet chunk = std::stoi(std::string(begin, pos));
+        int chunk = std::stoi(std::string(begin, pos));
         assert(chunk >= 0 && chunk <= 255);
-        address->push_back(chunk);
+        address[index++] = static_cast<Octet>(chunk);
         begin = (pos == end) ? end : std::next(pos);
     }
 
-    assert(address->size() == 4);
+    assert(index == 4);
     return address;
 }
 
-std::ostream& operator<< (std::ostream &out, const AddressPtr& address)
+std::ostream& operator<< (std::ostream &out, const Address& address)
 {
     bool first = true;
-    for (const auto& part : *address)
+    for (const auto& octet : address)
     {
         if (!first)
         {
             out << '.';
         }
-        out << part;
+        out << static_cast<unsigned int>(octet);
         first = false;
     }
     return out;
 }
 
-std::ostream& operator<< (std::ostream &out, const Pool& pool)
+template <typename Container>
+void print(std::ostream &out, const Container& pool)
 {
     bool first = true;
     for (auto pos = pool.rbegin(); pos != pool.rend(); ++pos)
     {
         if (!first)
         {
-            std::cout << '\n';
+            out << '\n';
         }
         out << *(pos);
         first = false;
     }
+}
+
+std::ostream& operator<< (std::ostream &out, const Pool& pool)
+{
+    print(out, pool);
+    return out;
+}
+
+std::ostream& operator<< (std::ostream &out, const PoolUnique& pool)
+{
+    print(out, pool);
     return out;
 }
 
 template <bool any = false, typename ...Args>
-Pool filter(RIndex cache, Octet first, Args... args)
+PoolUnique filter(RIndex rIndex, Octet first, Args... args)
 {
-    std::vector<Octet> target{first, args...};
-    assert(target.size() <= 4);
+    Address target{first, static_cast<Octet>(args)...};
 
-    Pool pool = cache.at(target[0]);
+    PoolUnique pool = rIndex.at(target[0]);
     if (any)
     {
         return pool;
     }
 
-    Pool result;
+    PoolUnique result;
 
-    std::copy_if(pool.begin(), pool.end(),  std::inserter(result, result.end()), [&target](const AddressPtr& address)
+    std::copy_if(pool.begin(), pool.end(),  std::inserter(result, result.end()), [&target](const Address& address)
     {
         size_t size = target.size();
         for (size_t i = 0; i < size; ++i)
         {
-            if(address->at(i) != target[i])
+            if(address[i] != target[i])
             {
                 return false;
             }
@@ -108,7 +108,7 @@ int main()
     try
     {
         Pool pool;
-        RIndex cache;
+        RIndex rIndex;
 
         for(std::string line; std::getline(std::cin, line);)
         {
@@ -119,12 +119,12 @@ int main()
             }
 
             auto pos = std::find(line.begin(), line.end(), '\t');
-            AddressPtr address = split(line.begin(), pos, '.');
+            Address address = split(line.begin(), pos, '.');
 
             for (size_t i = 0; i < 4; i++)
             {
-                Octet chunk = (*address)[i];
-                cache[chunk].insert(address);
+                Octet octet = address[i];
+                rIndex[octet].insert(address);
             }
 
             pool.insert(address);
@@ -139,20 +139,20 @@ int main()
         // 1.29.168.152
         // 1.1.234.8
 
-        std::cout << filter(cache, 1) << std::endl;
+        std::cout << filter(rIndex, 1) << std::endl;
         // 1.231.69.33
         // 1.87.203.225
         // 1.70.44.170
         // 1.29.168.152
         // 1.1.234.8
 
-        std::cout << filter(cache, 46, 70) << std::endl;
+        std::cout << filter(rIndex, 46, 70) << std::endl;
         // 46.70.225.39
         // 46.70.147.26
         // 46.70.113.73
         // 46.70.29.76
 
-        std::cout << filter<true>(cache, 46) << std::endl;
+        std::cout << filter<true>(rIndex, 46) << std::endl;
         // 186.204.34.46
         // 186.46.222.194
         // 185.46.87.231
