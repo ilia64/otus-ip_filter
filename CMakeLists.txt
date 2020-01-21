@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.2)
+cmake_minimum_required(VERSION 3.7)
 
 set(MY_BUILD_PATH bin)
 if(NOT DEFINED ENV{TRAVIS_BUILD_NUMBER})
@@ -15,6 +15,8 @@ enable_testing()
 add_subdirectory(version)
 add_subdirectory(ip_filter)
 
+message(">> Targets: ${BUILDSYSTEM_TARGETS}")
+
 set(CPACK_GENERATOR DEB)
 set(CPACK_PACKAGE_VERSION_MAJOR "${PROJECT_VERSION_MAJOR}")
 set(CPACK_PACKAGE_VERSION_MINOR "${PROJECT_VERSION_MINOR}")
@@ -24,4 +26,3 @@ set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
 
 include(CPack)
 
-install(TARGETS version/version ip_filter/ip_filter RUNTIME DESTINATION ${MY_BUILD_PATH})

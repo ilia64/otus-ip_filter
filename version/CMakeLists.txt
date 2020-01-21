@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.2)
+cmake_minimum_required(VERSION 3.7)
 
 find_package(Threads REQUIRED)
 find_package(Boost COMPONENTS unit_test_framework REQUIRED)
@@ -33,3 +33,5 @@ target_link_libraries(test_version
         )
 
 add_test(version_tests test_version)
+
+install(TARGETS version RUNTIME DESTINATION ${MY_BUILD_PATH})
