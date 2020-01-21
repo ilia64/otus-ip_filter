@@ -14,15 +14,3 @@ enable_testing()
 
 add_subdirectory(version)
 add_subdirectory(ip_filter)
-
-message(">> Targets: ${BUILDSYSTEM_TARGETS}")
-
-set(CPACK_GENERATOR DEB)
-set(CPACK_PACKAGE_VERSION_MAJOR "${PROJECT_VERSION_MAJOR}")
-set(CPACK_PACKAGE_VERSION_MINOR "${PROJECT_VERSION_MINOR}")
-set(CPACK_PACKAGE_VERSION_PATCH "${PROJECT_VERSION_PATCH}")
-set(CPACK_PACKAGE_CONTACT ilia64mods@gmail.com)
-set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
-
-include(CPack)
-
