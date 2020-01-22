@@ -1,16 +1,27 @@
 cmake_minimum_required(VERSION 3.7)
 
 set(MY_BUILD_PATH bin)
-if(NOT DEFINED ENV{TRAVIS_BUILD_NUMBER})
+if (NOT DEFINED ENV{TRAVIS_BUILD_NUMBER})
     set(ENV{TRAVIS_BUILD_NUMBER} 1)
     set(MY_BUILD_PATH ${CMAKE_CURRENT_SOURCE_DIR}/bin)
-endif()
+endif ()
 
-project(OTUS_CPP VERSION 0.0.$ENV{TRAVIS_BUILD_NUMBER})
+project(ip_filter VERSION 0.0.$ENV{TRAVIS_BUILD_NUMBER})
 
-message(">> Build: ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}")
+add_executable(ip_filter ip_filter.cpp)
 
-enable_testing()
+set_target_properties(ip_filter PROPERTIES
+        CXX_STANDARD 17
+        CXX_STANDARD_REQUIRED ON
+        COMPILE_OPTIONS "-Wpedantic;-Wall;-Wextra"
+        )
 
-add_subdirectory(version)
-add_subdirectory(ip_filter)
+install(TARGETS ip_filter RUNTIME DESTINATION ${MY_BUILD_PATH})
+
+set(CPACK_GENERATOR DEB)
+set(CPACK_PACKAGE_VERSION_MAJOR "${PROJECT_VERSION_MAJOR}")
+set(CPACK_PACKAGE_VERSION_MINOR "${PROJECT_VERSION_MINOR}")
+set(CPACK_PACKAGE_VERSION_PATCH "${PROJECT_VERSION_PATCH}")
+set(CPACK_PACKAGE_CONTACT ilia64mods@gmail.com)
+set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
+include(CPack)

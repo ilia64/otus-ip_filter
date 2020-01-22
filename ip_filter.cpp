@@ -112,12 +112,6 @@ int main()
 
         for(std::string line; std::getline(std::cin, line);)
         {
-            //TODO @i.lukin remove on done
-            if (line.empty())
-            {
-                break;
-            }
-
             auto pos = std::find(line.begin(), line.end(), '\t');
             Address address = split(line.begin(), pos, '.');
 
@@ -130,6 +124,9 @@ int main()
             pool.insert(address);
         }
 
+        //cat bin/ip_filter.tsv | bin/ip_filter
+
+        std::cout << "---- pool" << std::endl;
         std::cout << pool << std::endl;
         // 222.173.235.246
         // 222.130.177.64
@@ -139,6 +136,7 @@ int main()
         // 1.29.168.152
         // 1.1.234.8
 
+        std::cout << "---- filter(rIndex, 1)" << std::endl;
         std::cout << filter(rIndex, 1) << std::endl;
         // 1.231.69.33
         // 1.87.203.225
@@ -146,12 +144,14 @@ int main()
         // 1.29.168.152
         // 1.1.234.8
 
+        std::cout << "---- filter(rIndex, 46, 70)" << std::endl;
         std::cout << filter(rIndex, 46, 70) << std::endl;
         // 46.70.225.39
         // 46.70.147.26
         // 46.70.113.73
         // 46.70.29.76
 
+        std::cout << "---- filter<true>(rIndex, 46, 70)" << std::endl;
         std::cout << filter<true>(rIndex, 46) << std::endl;
         // 186.204.34.46
         // 186.46.222.194
