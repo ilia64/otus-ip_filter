@@ -6,6 +6,7 @@
 #include <array>
 #include <set>
 #include <map>
+#include <vector>
 
 using Octet = unsigned char;
 using Address = std::array<Octet, 4>;
@@ -77,7 +78,7 @@ std::ostream& operator<< (std::ostream &out, const PoolUnique& pool)
 template <bool any = false, typename ...Args>
 PoolUnique filter(RIndex rIndex, Octet first, Args... args)
 {
-    Address target{first, static_cast<Octet>(args)...};
+    std::vector<Octet> target{first, static_cast<Octet>(args)...};
 
     PoolUnique pool = rIndex.at(target[0]);
     if (any)
@@ -112,6 +113,11 @@ int main()
 
         for(std::string line; std::getline(std::cin, line);)
         {
+            if (line.empty())
+            {
+                break;
+            }
+
             auto pos = std::find(line.begin(), line.end(), '\t');
             Address address = split(line.begin(), pos, '.');
 
@@ -126,7 +132,6 @@ int main()
 
         //cat bin/ip_filter.tsv | bin/ip_filter
 
-        std::cout << "---- pool" << std::endl;
         std::cout << pool << std::endl;
         // 222.173.235.246
         // 222.130.177.64
@@ -136,7 +141,6 @@ int main()
         // 1.29.168.152
         // 1.1.234.8
 
-        std::cout << "---- filter(rIndex, 1)" << std::endl;
         std::cout << filter(rIndex, 1) << std::endl;
         // 1.231.69.33
         // 1.87.203.225
@@ -144,14 +148,12 @@ int main()
         // 1.29.168.152
         // 1.1.234.8
 
-        std::cout << "---- filter(rIndex, 46, 70)" << std::endl;
         std::cout << filter(rIndex, 46, 70) << std::endl;
         // 46.70.225.39
         // 46.70.147.26
         // 46.70.113.73
         // 46.70.29.76
 
-        std::cout << "---- filter<true>(rIndex, 46, 70)" << std::endl;
         std::cout << filter<true>(rIndex, 46) << std::endl;
         // 186.204.34.46
         // 186.46.222.194
