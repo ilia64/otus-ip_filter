@@ -5,13 +5,11 @@
 #include <string>
 #include <array>
 #include <set>
-#include <map>
 #include <vector>
 
 using Octet = unsigned char;
 using Address = std::array<Octet, 4>;
 using Pool = std::multiset<Address, std::greater<>>;
-using RIndex = std::map<Octet, Pool>;
 
 template <typename Iter, typename D>
 Address split(Iter begin, Iter end, D delimiter)
@@ -56,41 +54,11 @@ std::ostream& operator<< (std::ostream &out, const Pool& pool)
     return out;
 }
 
-template <bool any = false, typename ...Args>
-Pool filter(RIndex rIndex, Octet first, Args... args)
-{
-    std::vector<Octet> target{first, static_cast<Octet>(args)...};
-
-    auto pool = rIndex.at(target[0]);
-    if (any)
-    {
-        return pool;
-    }
-
-    Pool result;
-
-    std::copy_if(pool.begin(), pool.end(),  std::inserter(result, result.end()), [&target](const Address& address)
-    {
-        size_t size = target.size();
-        for (size_t i = 0; i < size; ++i)
-        {
-            if(address[i] != target[i])
-            {
-                return false;
-            }
-        }
-        return true;
-    });
-
-    return result;
-}
-
 int main()
 {
     try
     {
         Pool pool;
-        RIndex rIndex;
 
         for(std::string line; std::getline(std::cin, line);)
         {
@@ -101,75 +69,40 @@ int main()
 
             auto pos = std::find(line.begin(), line.end(), '\t');
             Address address = split(line.begin(), pos, '.');
-
-            for (size_t i = 0; i < 4; i++)
-            {
-                Octet octet = address[i];
-                rIndex[octet].insert(address);
-            }
-
             pool.insert(address);
         }
 
-        //cat bin/ip_filter.tsv | bin/ip_filter
-
         std::cout << pool;
-        // 222.173.235.246
-        // 222.130.177.64
-        // 222.82.198.61
-        // ...
-        // 1.70.44.170
-        // 1.29.168.152
-        // 1.1.234.8
 
-        std::cout << filter(rIndex, 1);
-        // 1.231.69.33
-        // 1.87.203.225
-        // 1.70.44.170
-        // 1.29.168.152
-        // 1.1.234.8
+        std::for_each(pool.begin(), pool.end(), [](const Address& a)
+        {
+            if (a[0] == 1)
+            {
+                std::cout << a << '\n';
+            }
+        });
 
-        std::cout << filter(rIndex, 46, 70);
-        // 46.70.225.39
-        // 46.70.147.26
-        // 46.70.113.73
-        // 46.70.29.76
+        std::for_each(pool.begin(), pool.end(), [](const Address& a)
+        {
+            if (a[0] == 46 && a[1] == 70)
+            {
+                std::cout << a << '\n';
+            }
+        });
 
-        std::cout << filter<true>(rIndex, 46);
-        // 186.204.34.46
-        // 186.46.222.194
-        // 185.46.87.231
-        // 185.46.86.132
-        // 185.46.86.131
-        // 185.46.86.131
-        // 185.46.86.22
-        // 185.46.85.204
-        // 185.46.85.78
-        // 68.46.218.208
-        // 46.251.197.23
-        // 46.223.254.56
-        // 46.223.254.56
-        // 46.182.19.219
-        // 46.161.63.66
-        // 46.161.61.51
-        // 46.161.60.92
-        // 46.161.60.35
-        // 46.161.58.202
-        // 46.161.56.241
-        // 46.161.56.203
-        // 46.161.56.174
-        // 46.161.56.106
-        // 46.161.56.106
-        // 46.101.163.119
-        // 46.101.127.145
-        // 46.70.225.39
-        // 46.70.147.26
-        // 46.70.113.73
-        // 46.70.29.76
-        // 46.55.46.98
-        // 46.49.43.85
-        // 39.46.86.85
-        // 5.189.203.46
+        std::for_each(pool.begin(), pool.end(), [](const Address& a)
+        {
+            bool has = std::any_of(a.begin(), a.end(), [](Octet o)
+            {
+                return o == 46;
+            });
+
+            if (has)
+            {
+                std::cout << a << '\n';
+            }
+        });
+
     }
     catch(const std::exception &e)
     {
