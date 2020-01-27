@@ -10,9 +10,8 @@
 
 using Octet = unsigned char;
 using Address = std::array<Octet, 4>;
-using Pool = std::multiset<Address>;
-using PoolUnique = std::set<Address>;
-using RIndex = std::map<Octet, PoolUnique>;
+using Pool = std::multiset<Address, std::greater<>>;
+using RIndex = std::map<Octet, Pool>;
 
 template <typename Iter, typename D>
 Address split(Iter begin, Iter end, D delimiter)
@@ -48,45 +47,27 @@ std::ostream& operator<< (std::ostream &out, const Address& address)
     return out;
 }
 
-template <typename Container>
-void print(std::ostream &out, const Container& pool)
-{
-    bool first = true;
-    for (auto pos = pool.rbegin(); pos != pool.rend(); ++pos)
-    {
-        if (!first)
-        {
-            out << '\n';
-        }
-        out << *(pos);
-        first = false;
-    }
-}
-
 std::ostream& operator<< (std::ostream &out, const Pool& pool)
 {
-    print(out, pool);
-    return out;
-}
-
-std::ostream& operator<< (std::ostream &out, const PoolUnique& pool)
-{
-    print(out, pool);
+    for (const auto& address : pool)
+    {
+        out << address << '\n';
+    }
     return out;
 }
 
 template <bool any = false, typename ...Args>
-PoolUnique filter(RIndex rIndex, Octet first, Args... args)
+Pool filter(RIndex rIndex, Octet first, Args... args)
 {
     std::vector<Octet> target{first, static_cast<Octet>(args)...};
 
-    PoolUnique pool = rIndex.at(target[0]);
+    auto pool = rIndex.at(target[0]);
     if (any)
     {
         return pool;
     }
 
-    PoolUnique result;
+    Pool result;
 
     std::copy_if(pool.begin(), pool.end(),  std::inserter(result, result.end()), [&target](const Address& address)
     {
@@ -132,7 +113,7 @@ int main()
 
         //cat bin/ip_filter.tsv | bin/ip_filter
 
-        std::cout << pool << std::endl;
+        std::cout << pool;
         // 222.173.235.246
         // 222.130.177.64
         // 222.82.198.61
@@ -141,20 +122,20 @@ int main()
         // 1.29.168.152
         // 1.1.234.8
 
-        std::cout << filter(rIndex, 1) << std::endl;
+        std::cout << filter(rIndex, 1);
         // 1.231.69.33
         // 1.87.203.225
         // 1.70.44.170
         // 1.29.168.152
         // 1.1.234.8
 
-        std::cout << filter(rIndex, 46, 70) << std::endl;
+        std::cout << filter(rIndex, 46, 70);
         // 46.70.225.39
         // 46.70.147.26
         // 46.70.113.73
         // 46.70.29.76
 
-        std::cout << filter<true>(rIndex, 46) << std::endl;
+        std::cout << filter<true>(rIndex, 46);
         // 186.204.34.46
         // 186.46.222.194
         // 185.46.87.231

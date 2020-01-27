@@ -1,3 +1,4 @@
-/bin/
+/bin/ip_filter
+/bin/result.tst
 /cmake-build-debug/
 /.idea/
